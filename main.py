@@ -1,6 +1,7 @@
 from lark import Lark, Transformer, v_args
 from pathlib import Path
 import sys
+from utils import same_values_unordered
 
 # Define visitor
 @v_args(inline=True)
@@ -24,27 +25,16 @@ class GCodeGenerator(Transformer):
     
     def start(self, *commands):
         return "\n".join(str(c) for (c) in commands)
+
+    def number(self, value):
+        return float(value)
     
     def gcode_block(self, *commands):
         return "\n".join(str(c) for (c) in commands)
 
     def gcommand(self, *params):
-        if len(params) != 4:
-            raise SyntaxError("Must have exactly 4 parameters")
-        var_type = [p[0] for p in params]
-        var_values = [p[1] for p in params]
-        expected = {"X", "Y", "Z", "S"}
-        seen = set(var_type)
-
-        if seen != expected:
-            missing = expected - seen
-            extra = [v for v in var_type if var_type.count(v) > 1]
-            msg = []
-            if missing:
-                msg.append(f"Missing: {', '.join(missing)}")
-            if extra:
-                msg.append(f"Duplicates: {', '.join(set(extra))}")
-            raise ValueError("Invalid gcommand: " + "; ".join(msg))
+        assert(same_values_unordered(params, {"X", "Y", "Z", "S"}))
+        
         return f"G0 {" ".join([p[0] + str(p[1]) for p in params])}"
         
     def gparam_x(self, value):
@@ -98,7 +88,7 @@ TRANSFORMED:
     
 def main():
     code = """
-    G0 Y5.458 Z2.000 S8.140 X1.021
+    G0 Y5 Z2.000 S8.140 X1.021
     """
     transpile(code)
     
