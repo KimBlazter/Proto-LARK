@@ -1,11 +1,19 @@
 start: command+
 
-?command: move | printc | pause
+?command: move | printc | pause | gcode_block
 
 move: "move" coord+
 coord: (X | Y | Z) "=" SIGNED_NUMBER
 printc: "print" STATE
 pause: "pause"
+
+gcode_block: gcommand+
+gcommand: "G0" (gparam_speed | gparam_x | gparam_y | gparam_z)+
+
+gparam_x: "X"FLOAT
+gparam_y: "Y"FLOAT
+gparam_z: "Z"FLOAT
+gparam_speed: "S"FLOAT
 
 STATE: "on" | "off"
 X: "x"
@@ -14,5 +22,6 @@ Z: "z"
 
 %import common.SIGNED_NUMBER
 %import common.WS
+%import common.FLOAT
 %ignore /#.*/   // comments are ignored
 %ignore WS
