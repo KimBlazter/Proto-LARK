@@ -10,15 +10,18 @@ pause: "pause"
 gcode_block: gcommand+
 gcommand: "G0" (gparam_speed | gparam_x | gparam_y | gparam_z)+
 
-gparam_x: "X"FLOAT
-gparam_y: "Y"FLOAT
-gparam_z: "Z"FLOAT
-gparam_speed: "S"FLOAT
+gparam_x: "X"number
+gparam_y: "Y"number
+gparam_z: "Z"number
+gparam_speed: "S"number
+
+number: SIGNED_NUMBER | FLOAT
 
 STATE: "on" | "off"
 X: "x"
 Y: "y"
 Z: "z"
+
 
 %import common.SIGNED_NUMBER
 %import common.WS
