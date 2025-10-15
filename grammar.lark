@@ -1,0 +1,18 @@
+start: command+
+
+?command: move | printc | pause
+
+move: "move" coord+
+coord: (X | Y | Z) "=" SIGNED_NUMBER
+printc: "print" STATE
+pause: "pause"
+
+STATE: "on" | "off"
+X: "x"
+Y: "y"
+Z: "z"
+
+%import common.SIGNED_NUMBER
+%import common.WS
+%ignore /#.*/   // comments are ignored
+%ignore WS
