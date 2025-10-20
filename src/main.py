@@ -1,7 +1,7 @@
 from lark import Lark, Transformer, v_args
 from pathlib import Path
 import sys
-from utils import same_values_unordered, flatten_str
+from utils import same_values_unordered, flatten_str, check_type
 
 # Define visitor
 @v_args(inline=True)
@@ -40,11 +40,13 @@ class GCodeGenerator(Transformer):
         # TODO
         # Add ident to tab symb
         # Add value to ident
-        ident, type, value = args
+        ident, const_type, value = args
         
         print(f"Ident: {ident}")
-        print(f"Type: {type}")
+        print(f"Type: {const_type}")
         print(f"Value: {value}")
+        
+        assert(check_type(value, const_type))
         
         return ""
 
