@@ -1,0 +1,33 @@
+start: command+
+
+?command: move 
+        | pause
+        | condition
+
+move: "move" PRINT? coord+
+coord: (X | Y | Z | S) "=" NUMBER // one of each verified in code
+pause: "pause"
+
+// CONTROL STRUCTURE
+condition: "if" "(" expression ")" "then" block
+block: command | "{" command+ "}"
+
+// EXPRESSIONS
+expression: BOOLEAN
+ 
+
+
+NUMBER: SIGNED_NUMBER | FLOAT
+BOOLEAN: "true" | "false"
+PRINT: "print"
+X: "x"
+Y: "y"
+Z: "z"
+S: "s"
+
+
+%import common.SIGNED_NUMBER
+%import common.WS
+%import common.FLOAT
+%ignore /#.*/   // comments are ignored
+%ignore WS

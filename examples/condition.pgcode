@@ -1,0 +1,5 @@
+move x=1 y=1.5 s=7 z=4
+if (false) then {
+    move x=1 y=1.5 s=7 z=5
+}
+move x=1 y=1.5 s=7 z=4
