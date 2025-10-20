@@ -29,9 +29,24 @@ class GCodeGenerator(Transformer):
     def pause(self):
         return "M0"
     
-    def start(self, *commands):
+    def program(self, *commands):
         # remove lines only containing ""
         return "\n".join(filter(lambda c: c!= "" , [str(c) for (c) in commands]))
+
+    '''
+    Definition
+    '''
+    def const(self, *args):
+        # TODO
+        # Add ident to tab symb
+        # Add value to ident
+        ident, type, value = args
+        
+        print(f"Ident: {ident}")
+        print(f"Type: {type}")
+        print(f"Value: {value}")
+        
+        return ""
 
     '''
     Control structure
@@ -52,31 +67,20 @@ class GCodeGenerator(Transformer):
     '''
     Terminals
     '''
+    
+    def primary(self, value):
+        return value
+    
+    def value(self, value):
+        return value
+    
     def BOOLEAN(self, token):
         return token == "true"
 
     def NUMBER(self, value):
         return float(value)
     
-    '''def gcode_block(self, *commands):
-        return "\n".join(str(c) for (c) in commands)
-
-    def gcommand(self, *params):
-        assert(same_values_unordered(params, {"X", "Y", "Z", "S"}))
-        
-        return f"G0 {" ".join([id + str(v) for id, v in params])}"
-        
-    def gparam_x(self, value):
-        return ("X", value)
     
-    def gparam_y(self, value):
-        return ("Y", value)
-    
-    def gparam_z(self, value):
-        return ("Z", value)
-    
-    def gparam_speed(self, value):
-        return ("S", value)'''
 
 def load_pgcode(filename):
     """Load grammar from a .pgcode"""
@@ -99,7 +103,7 @@ def load_grammar():
 def transpile(pgcode_source):
     """Transpile le code pg-code vers G-code"""
     grammar = load_grammar()
-    parser = Lark(grammar, start='start', parser='lalr')
+    parser = Lark(grammar, start='program', parser='lalr')
     
     try:
         tree = parser.parse(pgcode_source)
@@ -126,8 +130,9 @@ TRANSFORMED:
         sys.exit(1)
     
 def main():
-    filename = "move_print"
+    # filename = "move_print"
     # filename = "condition"
+    filename = "const"
     
     code = load_pgcode(filename)
     transpile(code)

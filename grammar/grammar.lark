@@ -1,25 +1,38 @@
-start: command+
+program: command+
 
 ?command: move 
         | pause
         | condition
+        | const
 
 move: "move" PRINT? coord+
 coord: (X | Y | Z | S) "=" NUMBER // one of each verified in code
 pause: "pause"
+
+// Variables
+const: "const" IDENT ":" TYPE "=" expression
 
 // CONTROL STRUCTURE
 condition: "if" "(" expression ")" "then" block
 block: command | "{" command+ "}"
 
 // EXPRESSIONS
-expression: BOOLEAN
+expression: primary 
  
 
+// 
+primary: value | IDENT | "(" expression ")"
+value: BOOLEAN | NUMBER
+ 
 
+// Terminals
 NUMBER: SIGNED_NUMBER | FLOAT
 BOOLEAN: "true" | "false"
+TYPE: "int"
 PRINT: "print"
+IDENT: /[a-zA-Z_][a-zA-Z0-9_]*/
+
+// Coords
 X: "x"
 Y: "y"
 Z: "z"
