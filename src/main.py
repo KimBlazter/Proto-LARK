@@ -78,9 +78,17 @@ class GCodeGenerator(Transformer):
     def gparam_speed(self, value):
         return ("S", value)'''
 
+def load_pgcode(filename):
+    """Load grammar from a .pgcode"""
+    pgcode = ""
+    with open(f'examples/{filename}.pgcode', 'r') as file:
+        pgcode = file.read()
+        
+    return pgcode
+
 def load_grammar():
     """Load grammar for a .lark file"""
-    grammar_file = Path(__file__).parent / "grammar.lark"
+    grammar_file = Path(__file__).parent.parent / "grammar" / "grammar.lark"
     
     if not grammar_file.exists():
         print(f"Error: Grammar file '{grammar_file}' not found.")
@@ -121,11 +129,8 @@ def main():
     filename = "move_print"
     # filename = "condition"
     
-    pgcode = ""
-    with open(f'pgcodes/{filename}.pgcode', 'r') as file:
-        pgcode = file.read()
-    
-    transpile(pgcode)
+    code = load_pgcode(filename)
+    transpile(code)
     
     
 
