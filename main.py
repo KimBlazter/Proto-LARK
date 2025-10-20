@@ -1,7 +1,7 @@
 from lark import Lark, Transformer, v_args
 from pathlib import Path
 import sys
-from utils import same_values_unordered
+from utils import same_values_unordered, flatten_str
 
 # Define visitor
 @v_args(inline=True)
@@ -12,6 +12,8 @@ class GCodeGenerator(Transformer):
         return (axis.value, float(val))
     
     def move(self, *coords):
+        assert(same_values_unordered(coords, {'x', 'y','z', 's'}))
+        
         cmd = "G1"
         for axis, val in coords:
             cmd += f" {axis.upper()}{val}"
@@ -26,16 +28,38 @@ class GCodeGenerator(Transformer):
     def start(self, *commands):
         return "\n".join(str(c) for (c) in commands)
 
-    def number(self, value):
+    '''
+    Control structure
+    '''
+    def condition(self, expr, *block):
+        if expr:
+            return flatten_str([instr for instr in block])
+    
+    def block(self, *block):
+        return flatten_str([instr for instr in block])
+
+    '''
+    Expressions
+    '''
+    def expression(self, value):
+        return value
+
+    '''
+    Terminals
+    '''
+    def BOOLEAN(self, token):
+        return token == "true"
+
+    def NUMBER(self, value):
         return float(value)
     
-    def gcode_block(self, *commands):
+    '''def gcode_block(self, *commands):
         return "\n".join(str(c) for (c) in commands)
 
     def gcommand(self, *params):
         assert(same_values_unordered(params, {"X", "Y", "Z", "S"}))
         
-        return f"G0 {" ".join([p[0] + str(p[1]) for p in params])}"
+        return f"G0 {" ".join([id + str(v) for id, v in params])}"
         
     def gparam_x(self, value):
         return ("X", value)
@@ -47,7 +71,7 @@ class GCodeGenerator(Transformer):
         return ("Z", value)
     
     def gparam_speed(self, value):
-        return ("S", value)
+        return ("S", value)'''
 
 def load_grammar():
     """Load grammar for a .lark file"""
@@ -83,12 +107,17 @@ TRANSFORMED:
         ''')
         return gcode
     except Exception as e:
-        print(f"Erreur de transpilation: {e}")
+        print(f"Critical error during transpiling: {e}")
         sys.exit(1)
     
 def main():
     code = """
-    G0 Y5 Z2.000 S8.140 X1.021
+    move x=1 y=1.5 s=7 z=4
+    if (true) then {move x=1 y=1.5 s=7 z=4
+        move x=1 y=1.5 s=7 z=3
+        move x=1 y=1.5 s=7 z=5
+    }
+    move x=1 y=1.5 s=7 z=4
     """
     transpile(code)
     

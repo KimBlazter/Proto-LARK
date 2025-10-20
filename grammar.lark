@@ -1,26 +1,31 @@
 start: command+
 
-?command: move | printc | pause | gcode_block
+?command: move 
+        | printc 
+        | pause
+        | condition
 
 move: "move" coord+
-coord: (X | Y | Z) "=" SIGNED_NUMBER
+coord: (X | Y | Z | S) "=" NUMBER // one of each verified in code
 printc: "print" STATE
 pause: "pause"
 
-gcode_block: gcommand+
-gcommand: "G0" (gparam_speed | gparam_x | gparam_y | gparam_z)+
+// CONTROL STRUCTURE
+condition: "if" "(" expression ")" "then" block
+block: command | "{" command+ "}"
 
-gparam_x: "X"number
-gparam_y: "Y"number
-gparam_z: "Z"number
-gparam_speed: "S"number
+// EXPRESSIONS
+expression: BOOLEAN
+ 
 
-number: SIGNED_NUMBER | FLOAT
 
+NUMBER: SIGNED_NUMBER | FLOAT
+BOOLEAN: "true" | "false"
 STATE: "on" | "off"
 X: "x"
 Y: "y"
 Z: "z"
+S: "s"
 
 
 %import common.SIGNED_NUMBER
