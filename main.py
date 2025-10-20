@@ -26,14 +26,16 @@ class GCodeGenerator(Transformer):
         return "M0"
     
     def start(self, *commands):
-        return "\n".join(str(c) for (c) in commands)
+        # remove lines only containing ""
+        return "\n".join(filter(lambda c: c!= "" , [str(c) for (c) in commands]))
 
     '''
     Control structure
     '''
     def condition(self, expr, *block):
-        if expr:
-            return flatten_str([instr for instr in block])
+        return flatten_str([instr for instr in block]) if expr else "" 
+
+            
     
     def block(self, *block):
         return flatten_str([instr for instr in block])
@@ -113,7 +115,8 @@ TRANSFORMED:
 def main():
     code = """
     move x=1 y=1.5 s=7 z=4
-    if (true) then {move x=1 y=1.5 s=7 z=4
+    if (false) then {
+        move x=1 y=1.5 s=7 z=4
         move x=1 y=1.5 s=7 z=3
         move x=1 y=1.5 s=7 z=5
     }
