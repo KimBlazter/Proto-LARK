@@ -11,17 +11,21 @@ class GCodeGenerator(Transformer):
     def coord(self, axis, val):
         return (axis.value, float(val))
     
-    def move(self, *coords):
+    def move(self, *items):
+        # Determine if printing is needed
+        has_print = items[0] == "print"
+        coords = items[1:] if has_print else items
+        
+        # Test for parameters
         assert(same_values_unordered(coords, {'x', 'y','z', 's'}))
         
-        cmd = "G1"
+        # Create gcode command
+        cmd = "G1" if has_print else "G0"
         for axis, val in coords:
             cmd += f" {axis.upper()}{val}"
+        
         return cmd
-    
-    def printc(self, state_token):
-        return "M3" if state_token.value == "on" else "M5"
-    
+        
     def pause(self):
         return "M0"
     
@@ -35,7 +39,6 @@ class GCodeGenerator(Transformer):
     def condition(self, expr, *block):
         return flatten_str([instr for instr in block]) if expr else "" 
 
-            
     
     def block(self, *block):
         return flatten_str([instr for instr in block])
@@ -94,6 +97,7 @@ def transpile(pgcode_source):
         tree = parser.parse(pgcode_source)
         generator = GCodeGenerator()
         gcode = generator.transform(tree)
+        
         print(f'''
 ----------------
 
@@ -107,22 +111,21 @@ TRANSFORMED:
 
 ----------------
         ''')
+        
         return gcode
     except Exception as e:
         print(f"Critical error during transpiling: {e}")
         sys.exit(1)
     
 def main():
-    code = """
-    move x=1 y=1.5 s=7 z=4
-    if (false) then {
-        move x=1 y=1.5 s=7 z=4
-        move x=1 y=1.5 s=7 z=3
-        move x=1 y=1.5 s=7 z=5
-    }
-    move x=1 y=1.5 s=7 z=4
-    """
-    transpile(code)
+    filename = "move_print"
+    # filename = "condition"
+    
+    pgcode = ""
+    with open(f'pgcodes/{filename}.pgcode', 'r') as file:
+        pgcode = file.read()
+    
+    transpile(pgcode)
     
     
 
