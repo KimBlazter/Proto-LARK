@@ -42,9 +42,3 @@ Return a list of string as a single string separated by \n, works recursivly
 '''
 def flatten_str(list) -> str :
     return '\n'.join([s if type(s) == str else flatten_str(s) for s in list])
-
-a = 'G1 X1.0 Y1.5 S7.0 Z4.0'
-b = [a]
-c = [b]
-print(flatten_str(c))
-print(type(a))
