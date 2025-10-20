@@ -42,3 +42,15 @@ Return a list of string as a single string separated by \n, works recursivly
 '''
 def flatten_str(list) -> str :
     return '\n'.join([s if type(s) == str else flatten_str(s) for s in list])
+
+'''
+Check if the value is of type supposed
+
+@input value -> value to test
+@input supposed -> the pgcode type
+'''
+def check_type(value, supposed) -> bool:
+    match (supposed, type(value)):
+        case "int", float : return True
+        case "int", int : return True
+        case default: raise ValueError(f"Value {value} must be of type: {supposed}")
